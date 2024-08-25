@@ -41,6 +41,10 @@ else
     exit 1
 fi
 
+# Установка драйверов Wi-Fi
+echo "Installing Wi-Fi drivers..."
+pkg install -y wpa_supplicant
+
 # Функция для установки графической оболочки
 install_desktop_env() {
     case $1 in
@@ -109,6 +113,22 @@ if [ $de_choice -ge 1 ] && [ $de_choice -le 5 ]; then
     echo "Enabling necessary services..."
     sysrc dbus_enable="YES"
     sysrc hald_enable="YES"
+fi
+
+# Создание нового пользователя с паролем
+echo "Please create a new user for login."
+echo "Enter the username for the new user:"
+read new_user
+
+# Проверка, если пользователь уже существует
+if id "$new_user" &>/dev/null; then
+    echo "User $new_user already exists."
+else
+    echo "Adding user $new_user..."
+    pw useradd -n "$new_user" -m -G wheel -s /bin/sh
+    echo "Please set a password for $new_user:"
+    passwd "$new_user"
+    echo "User $new_user created and added to the 'wheel' group."
 fi
 
 echo "FreeBSD setup is complete. Please reboot your system to start using your selected desktop environment."
