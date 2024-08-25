@@ -56,27 +56,32 @@ install_desktop_env() {
             echo "exec ck-launch-session startplasma-x11" > ~/.xinitrc
             ;;
         2)
-            echo "Installing GNOME..."
-            pkg install -y gnome gdm
+            echo "Select GNOME version to install:"
+            echo "1) Full GNOME"
+            echo "2) GNOME Lite"
+            read gnome_choice
+            if [ "$gnome_choice" -eq 1 ]; then
+                echo "Installing full GNOME..."
+                pkg install -y gnome gdm
+            elif [ "$gnome_choice" -eq 2 ]; then
+                echo "Installing GNOME Lite..."
+                pkg install -y gnome-lite gdm
+            else
+                echo "Invalid GNOME option. Exiting setup."
+                exit 1
+            fi
             sysrc gdm_enable="YES"
             sysrc dbus_enable="YES"
             echo "exec gnome-session" > ~/.xinitrc
             ;;
         3)
-            echo "Installing XFCE..."
-            pkg install -y xfce xfce4-goodies slim
-            sysrc slim_enable="YES"
-            sysrc dbus_enable="YES"
-            echo "exec startxfce4" > ~/.xinitrc
-            ;;
-        4)
             echo "Installing Mate..."
             pkg install -y mate slim
             sysrc slim_enable="YES"
             sysrc dbus_enable="YES"
             echo "exec mate-session" > ~/.xinitrc
             ;;
-        5)
+        4)
             echo "Installing LXDE..."
             pkg install -y lxde slim
             sysrc slim_enable="YES"
@@ -93,9 +98,8 @@ install_desktop_env() {
 echo "Select a Desktop Environment to install:"
 echo "1) KDE Plasma"
 echo "2) GNOME"
-echo "3) XFCE"
-echo "4) Mate"
-echo "5) LXDE"
+echo "3) Mate"
+echo "4) LXDE"
 echo "Enter the number of your choice:"
 
 read de_choice
@@ -109,7 +113,7 @@ if ! grep -q '^proc[[:space:]]' /etc/fstab; then
 fi
 
 # Включение необходимых сервисов
-if [ $de_choice -ge 1 ] && [ $de_choice -le 5 ]; then
+if [ $de_choice -ge 1 ] && [ $de_choice -le 4 ]; then
     echo "Enabling necessary services..."
     sysrc dbus_enable="YES"
     sysrc hald_enable="YES"
